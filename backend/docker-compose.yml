@@ -53,6 +53,8 @@ services:
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
+    ports:
+      - '3000:3000'
     depends_on:
       rabbitmq:
         condition: service_healthy
