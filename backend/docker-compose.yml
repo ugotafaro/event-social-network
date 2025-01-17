@@ -16,6 +16,37 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - backend
+
+  zookeeper:
+    image: 'docker.io/bitnami/zookeeper:3-debian-10'
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - backend
+
+  kafka:
+    image: 'docker.io/bitnami/kafka:2-debian-10'
+    container_name: kafka
+    ports:
+      - 9092:9092
+      - 9093:9093
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://kafka:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+    depends_on:
+      - zookeeper
+    networks:
+      - backend
 
   nginx:
     image: nginx:alpine
@@ -27,6 +58,8 @@ services:
     depends_on:
       - api
       - auth
+    networks:
+      - backend
 
   api:
     container_name: api
@@ -44,6 +77,8 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     command: npm run start:dev api
+    networks:
+      - backend
 
   auth:
     build:
@@ -62,3 +97,43 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     command: npm run start:dev auth
+    networks:
+      - backend
+
+  events:
+    build:
+      context: ./
+      dockerfile: ./apps/events/Dockerfile
+    container_name: events
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    depends_on:
+      - kafka
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run start:dev events
+    networks:
+      - backend
+
+  users:
+    build:
+      context: ./
+      dockerfile: ./apps/users/Dockerfile
+    container_name: users
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    depends_on:
+      - kafka
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run start:dev users
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

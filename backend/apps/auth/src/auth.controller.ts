@@ -18,11 +18,6 @@ export class AuthController {
     return this.authService.getHello();
   }
 
-  @MessagePattern('auth.get-users')
-  getAllUsers() {
-    return this.authService.getAllUsers();
-  }
-
   @MessagePattern('auth.create')
   createUser(@Payload() user: UserDto) {
     return this.authService.createUser(user);

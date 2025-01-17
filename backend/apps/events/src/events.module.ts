@@ -1,18 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { EventsController } from './events.controller';
+import { EventsService } from './events.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'schemas/user.schemas';
+import { EventSchema } from 'schemas/event.schemas';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from 'strategy';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
     }),
+
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -21,12 +20,10 @@ import { JwtStrategy } from 'strategy';
       }),
       inject: [ConfigService],
     }),
-
     JwtModule.register({}),
-
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: Event.name, schema: EventSchema }]),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  controllers: [EventsController],
+  providers: [EventsService],
 })
-export class AuthModule {}
+export class EventsModule {}

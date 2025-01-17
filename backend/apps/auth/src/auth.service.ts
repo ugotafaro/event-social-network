@@ -20,10 +20,6 @@ export class AuthService {
     return 'Hello World!';
   }
 
-  getAllUsers(): Promise<User[]> {
-    return this.userModel.find().exec();
-  }
-
   async signin(dto: UserDto) {
     console.log('signin', dto);
     // find the user by email

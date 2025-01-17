@@ -1,10 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(4000, () =>
-    console.log('API is listening on http://localhost:4000'),
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
   );
+  await app.listen(4000);
 }
 bootstrap();

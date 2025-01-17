@@ -21,9 +21,6 @@ export class Event {
   creator: ObjectId;
 
   @Prop()
-  likes: string[];
-
-  @Prop()
   image: string;
 }
 
