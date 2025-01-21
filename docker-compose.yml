@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   rabbitmq:
     image: rabbitmq:3-management
@@ -9,10 +9,10 @@ services:
     volumes:
       - /var/lib/rabbitmq
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - "5672:5672"
+      - "15672:15672"
     healthcheck:
-      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -20,7 +20,7 @@ services:
       - backend
 
   zookeeper:
-    image: 'docker.io/bitnami/zookeeper:3-debian-10'
+    image: "docker.io/bitnami/zookeeper:3-debian-10"
     container_name: zookeeper
     ports:
       - 2181:2181
@@ -30,7 +30,7 @@ services:
       - backend
 
   kafka:
-    image: 'docker.io/bitnami/kafka:2-debian-10'
+    image: "docker.io/bitnami/kafka:2-debian-10"
     container_name: kafka
     ports:
       - 9092:9092
@@ -52,29 +52,34 @@ services:
     image: nginx:alpine
     container_name: nginx
     ports:
-      - '80:80'
+      - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - api
       - auth
+      - frontend
     networks:
       - backend
 
   api:
     container_name: api
     build:
-      context: ./
-      dockerfile: ./apps/api/Dockerfile
+      context: ./backend
+      dockerfile: apps/api/Dockerfile
     ports:
-      - '4000:4000'
+      - "4000:4000"
     depends_on:
       rabbitmq:
         condition: service_healthy
       auth:
         condition: service_started
+      events:
+        condition: service_started
+      users:
+        condition: service_started
     volumes:
-      - .:/usr/src/app
+      - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     command: npm run start:dev api
     networks:
@@ -82,19 +87,19 @@ services:
 
   auth:
     build:
-      context: ./
-      dockerfile: ./apps/auth/Dockerfile
+      context: ./backend
+      dockerfile: apps/auth/Dockerfile
     container_name: auth
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
     ports:
-      - '3000:3000'
+      - "3000:3000"
     depends_on:
       rabbitmq:
         condition: service_healthy
     volumes:
-      - .:/usr/src/app
+      - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     command: npm run start:dev auth
     networks:
@@ -102,16 +107,13 @@ services:
 
   events:
     build:
-      context: ./
-      dockerfile: ./apps/events/Dockerfile
+      context: ./backend
+      dockerfile: apps/events/Dockerfile
     container_name: events
-    environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: 5672
     depends_on:
       - kafka
     volumes:
-      - .:/usr/src/app
+      - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     command: npm run start:dev events
     networks:
@@ -119,18 +121,34 @@ services:
 
   users:
     build:
-      context: ./
-      dockerfile: ./apps/users/Dockerfile
+      context: ./backend
+      dockerfile: apps/users/Dockerfile
     container_name: users
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
     depends_on:
-      - kafka
+      rabbitmq:
+        condition: service_healthy
     volumes:
-      - .:/usr/src/app
+      - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     command: npm run start:dev users
+    networks:
+      - backend
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "24000:3000"
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run dev
+    restart: always
     networks:
       - backend
 
