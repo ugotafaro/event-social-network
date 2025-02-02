@@ -33,4 +33,14 @@ export class UsersController {
   async deleteUser(@Payload() id: string) {
     return await this.usersService.deleteUser(id);
   }
+
+  @MessagePattern('users.add-event-liked')
+  async addEventLiked(@Payload() data: any) {
+    return await this.usersService.addEventLiked(data.userId, data.eventId);
+  }
+
+  @MessagePattern('users.remove-event-liked')
+  async removeEventLiked(@Payload() data: any) {
+    return await this.usersService.removeEventLiked(data.userId, data.eventId);
+  }
 }

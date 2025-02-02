@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'schemas/user.schemas';
+import { Event } from 'schemas/event.schemas';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Event.name) private eventModel: Model<Event>,
+  ) {}
 
   async getAllUsers() {
     return this.userModel.find().exec();
@@ -43,5 +47,21 @@ export class UsersService {
     } catch (error) {
       throw new Error('Error deleting user');
     }
+  }
+
+  async addEventLiked(userId: string, eventId: string) {
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { $addToSet: { likedEvents: eventId } },
+      { new: true },
+    );
+  }
+
+  async removeEventLiked(userId: string, eventId: string) {
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { likedEvents: eventId } },
+      { new: true },
+    );
   }
 }

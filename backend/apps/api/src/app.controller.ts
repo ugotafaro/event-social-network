@@ -8,7 +8,9 @@ import {
   Post,
   Put,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ClientProxy, Payload } from '@nestjs/microservices';
@@ -17,6 +19,9 @@ import { EventDto } from 'dto/event.dto';
 import { UpdateEventDto } from 'dto/updateEvent.dto';
 import { ParamsTokenFactory } from '@nestjs/core/pipes';
 import { UpdateUserDto } from 'dto/updateUser.dto';
+import { Express } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Controller()
 export class AppController {
@@ -59,10 +64,20 @@ export class AppController {
     return this.appService.createUser(user);
   }
 
+  @Post('users/add-event-liked')
+  async addEventLiked(@Body() data: any) {
+    return await this.appService.addEventLiked(data.userId, data.eventId);
+  }
+
+  @Post('users/remove-event-liked')
+  async removeEventLiked(@Body() data: any) {
+    return await this.appService.removeEventLiked(data.userId, data.eventId);
+  }
+
   @Post('events/create')
-  @UseGuards(JwtAuthGuard)
-  async createEvent(@Body() event: any) {
-    return await this.appService.createEvent(event);
+  // @UseGuards(JwtAuthGuard)
+  async createEvent(@Body() data: any) {
+    return await this.appService.createEvent(data.event, data.user);
   }
 
   @Get('events')
@@ -86,5 +101,21 @@ export class AppController {
   @Delete('events/delete/:id')
   async deleteEvent(@Param() params: any) {
     return await this.appService.deleteEvent(params.id);
+  }
+
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './public/uploads', // Dossier pour stocker les images
+        filename: (req, file, callback) => {
+          const filename = `${Date.now()}_${file.originalname}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
+  uploadImage(@UploadedFile() file) {
+    return { imageUrl: `/uploads/${file.filename}` }; // Retourne l'URL de l'image
   }
 }

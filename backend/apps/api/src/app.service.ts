@@ -50,6 +50,20 @@ export class AppService implements OnModuleInit {
     return await this.usersClient.send('users.delete', id);
   }
 
+  async addEventLiked(userId: string, eventId: string) {
+    return await this.usersClient.send('users.add-event-liked', {
+      userId,
+      eventId,
+    });
+  }
+
+  async removeEventLiked(userId: string, eventId: string) {
+    return await this.usersClient.send('users.remove-event-liked', {
+      userId,
+      eventId,
+    });
+  }
+
   async signin(dto: UserDto) {
     try {
       const response = await this.authCLient
@@ -82,13 +96,12 @@ export class AppService implements OnModuleInit {
 
   // -----------------------------EVENTS--------------------------------------------
 
-  async createEvent(dto: any) {
+  async createEvent(event, user) {
     try {
-      console.log('Emitting event:', dto);
       const response = await this.kafkaClient
-        .send('events.create', dto)
+        .send('events.create', { event, user })
         .toPromise();
-      console.log('Kafka Response:', response);
+
       return response;
     } catch (error) {
       throw error;

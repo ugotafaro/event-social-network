@@ -8,9 +8,12 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @MessagePattern('events.create')
-  async createEvent(@Payload() dto: any) {
+  async createEvent(@Payload() data: any) {
     try {
-      const createdEvent = await this.eventsService.createEvent(dto); // Save the event
+      const createdEvent = await this.eventsService.createEvent(
+        data.event,
+        data.user,
+      ); // Save the event
       return createdEvent; // This will be sent back as the response
     } catch (error) {
       throw new Error('Error creating event');

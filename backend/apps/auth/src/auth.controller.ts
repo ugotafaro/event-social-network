@@ -1,11 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import {
-  Ctx,
-  MessagePattern,
-  Payload,
-  RmqContext,
-} from '@nestjs/microservices';
+import { Ctx, MessagePattern, Payload } from '@nestjs/microservices';
 import { User } from 'schemas/user.schemas';
 import { UserDto } from 'dto/users.dto';
 

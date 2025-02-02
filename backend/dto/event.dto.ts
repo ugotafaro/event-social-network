@@ -14,23 +14,11 @@ export class EventDto {
   @IsNotEmpty()
   description: string;
 
-  //   @IsString()
-  //   @IsNotEmpty()
-  //   date: string;
+  @IsString()
+  @IsNotEmpty()
+  date: string;
 
-  //   @IsString()
-  //   @IsNotEmpty()
-  //   location: string;
-
-  //   @IsString()
-  //   @IsNotEmpty()
-  //   creator: string;
-
-  //   @IsString()
-  //   @IsNotEmpty()
-  //   likes: string;
-
-  //   @IsString()
-  //   @IsNotEmpty()
-  //   image: string;
+  @IsString()
+  @IsNotEmpty()
+  location: string;
 }

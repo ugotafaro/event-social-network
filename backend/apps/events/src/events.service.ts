@@ -13,11 +13,14 @@ export class EventsService {
     private config: ConfigService,
   ) {}
 
-  async createEvent(dto: EventDto) {
+  async createEvent(dto: EventDto, user) {
     try {
-      const createdEvent = new this.eventModel(dto);
+      const createdEvent = new this.eventModel({
+        ...dto,
+        creator: user._id,
+      });
       const savedEvent = await createdEvent.save();
-      return savedEvent;
+      return savedEvent.toObject();
     } catch (error) {
       throw new Error('Error during event creation');
     }
@@ -37,7 +40,7 @@ export class EventsService {
   async getEventById(id: string) {
     try {
       const event = await this.eventModel.findById(id);
-      return event;
+      return event.toObject();
     } catch (error) {
       throw new RpcException({
         message: 'Error fetching event',

@@ -15,19 +15,13 @@ export class User {
   name: string;
 
   @Prop()
-  followers: string[];
-
-  @Prop()
-  following: string[];
+  surname: string;
 
   @Prop()
   createdEvents: ObjectId[];
 
   @Prop()
   likedEvents: ObjectId[];
-
-  @Prop()
-  savedEvents: ObjectId[];
 
   @Prop()
   profilePicture: string;

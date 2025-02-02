@@ -1,20 +1,20 @@
-# Use Node.js image
-FROM node:18-alpine
+# Utilisation de l'image Node.js officielle
+FROM node:18
 
-# Set working directory
-WORKDIR /usr/src/app
+# Définir le répertoire de travail
+WORKDIR /app
 
-# Copy package files
+# Copier les fichiers package.json et package-lock.json (ou yarn.lock) dans le conteneur
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Installer les dépendances
+RUN npm install --force
 
-# Copy the application code
+# Copier tous les fichiers du projet dans le conteneur
 COPY . .
 
-# Expose the application port 
-EXPOSE 3000
+# Exposer le port que Vite utilise par défaut
+EXPOSE 5173
 
-# Start the application in development mode
-CMD ["npm", "run", "dev"]
+# Lancer le serveur Vite en mode développement
+CMD ["npm", "run", "dev", "--", "--host"]

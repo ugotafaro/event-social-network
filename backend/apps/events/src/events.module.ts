@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { EventSchema } from 'schemas/event.schemas';
 import { JwtModule } from '@nestjs/jwt';
+import { User, UserSchema } from 'schemas/user.schemas';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     JwtModule.register({}),
     MongooseModule.forFeature([{ name: Event.name, schema: EventSchema }]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [EventsController],
   providers: [EventsService],
