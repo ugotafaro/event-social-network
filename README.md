@@ -7,6 +7,7 @@ git clone https://github.com/ugotafaro/event-social-network
 ```
 
 **2. Create a .env file at the root of backend folder**
+
 ```
 RABBITMQ_HOST= rabbitmq
 RABBITMQ_PORT= 5672
@@ -25,7 +26,4 @@ docker-compose up
 
 ## UML
 
-
-
-
-
+![Texte alternatif](Frame 1.png)
