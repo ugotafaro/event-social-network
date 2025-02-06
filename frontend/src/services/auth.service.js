@@ -35,12 +35,9 @@ export const logInUser = async (email, password) => {
   }
 };
 
-export const createUser = async (email, password) => {
+export const createUser = async (user) => {
   try {
-    const response = await axios.post("http://localhost/api/auth/create", {
-      email,
-      password,
-    });
+    const response = await axios.post("http://localhost/api/auth/create", user);
     localStorage.setItem("token", response.data.access_token);
     return response.data;
   } catch (error) {

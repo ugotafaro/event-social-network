@@ -13,6 +13,8 @@ RUN npm install --force
 # Copier tous les fichiers du projet dans le conteneur
 COPY . .
 
+RUN npm run build
+
 # Exposer le port que Vite utilise par défaut
 EXPOSE 5173
 

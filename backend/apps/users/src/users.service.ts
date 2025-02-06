@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { get, Model } from 'mongoose';
 import { User } from 'schemas/user.schemas';
 import { Event } from 'schemas/event.schemas';
+import * as argon from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -31,6 +32,37 @@ export class UsersService {
       if (!updatedUser) {
         throw new Error('Error updating user');
       }
+
+      console.log('updatedUser', updatedUser);
+      return updatedUser;
+    } catch (error) {
+      throw new Error('Error updating user');
+    }
+  }
+
+  async changePassword(id: string, password: string, newPassword: string) {
+    try {
+      console.log('newPassword', newPassword);
+      const hash = await argon.hash(newPassword);
+
+      //verify if password is correct
+      const user = await this.getUserById(id);
+
+      console.log('user', user);
+
+      if (!(await argon.verify(user.password, password))) {
+        console.log('Password incorrect');
+        throw new Error('Password incorrect');
+      }
+
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        id,
+        { password: hash },
+        { new: true },
+      );
+
+      console.log('updatedUser', updatedUser);
+
       return updatedUser;
     } catch (error) {
       throw new Error('Error updating user');

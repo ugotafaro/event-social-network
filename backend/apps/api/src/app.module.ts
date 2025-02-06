@@ -61,14 +61,9 @@ import { MongooseModule } from '@nestjs/mongoose';
       },
     ]),
     JwtModule.register({}),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('DATABASE_URI'),
-        dbName: configService.get<string>('DATABASE_NAME'),
-      }),
-      inject: [ConfigService],
-    }),
+
+    MongooseModule.forRoot('mongodb://mongodb:27017/event-social-network'),
+
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
 

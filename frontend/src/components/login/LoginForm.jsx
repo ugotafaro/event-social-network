@@ -1,25 +1,29 @@
 "use client";
 
-import { logInUser } from "../../services/auth.service";
+import { getUserAuthenticated, logInUser } from "../../services/auth.service";
 import { Alert, Button } from "@mui/material";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 
-export const LoginForm = () => {
-  const router = useNavigate();
+export const LoginForm = ({ setUser }) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      await logInUser(email, password).then((user) => {
-        console.log("User logged in:", user);
+      await logInUser(email, password).then((data) => {
+        setUser(data.user);
+        navigate("/");
       });
-      router("/");
     } catch (error) {
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,6 +71,7 @@ export const LoginForm = () => {
         <button
           type="submit"
           className="w-full bg-blue-500 text-white p-3 rounded-xl cursor-pointer"
+          disabled={loading}
         >
           Login
         </button>

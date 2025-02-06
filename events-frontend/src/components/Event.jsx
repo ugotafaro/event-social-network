@@ -13,27 +13,30 @@ import { useEffect } from "react";
 import { getEvents } from "../../events.service";
 import CreateEventModal from "./CreateEventModal";
 
-function Event({ user, handleLikeEvent, handleUnlikeEvent, eventsLiked }) {
-  // recup events from backend
-  const [events, setEvents] = useState([]);
+function Event({
+  user,
+  handleLikeEvent,
+  handleUnlikeEvent,
+  eventsLiked,
+  setCreatedEvents,
+  events,
+  setEvents,
+}) {
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    console.log("Getting events...");
-    getEvents()
-      .then((events) => {
-        setEvents(events);
-      })
-      .catch((error) => {
-        console.error("Error getting events: ", error);
-      });
-  }, []);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleEventCreated = (newEvent) => {
     console.log("New event received:", newEvent); // Debugging
 
     setEvents((prevEvents) => [newEvent, ...prevEvents]);
+    setCreatedEvents((prevEvents) => [newEvent, ...prevEvents]);
   };
+
+  const filteredEvents = events?.filter((event) => {
+    const eventTitle = event.title.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    return eventTitle.includes(query);
+  });
 
   return (
     <>
@@ -61,6 +64,8 @@ function Event({ user, handleLikeEvent, handleUnlikeEvent, eventsLiked }) {
                 type="text"
                 placeholder="Search events..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <button
@@ -74,7 +79,7 @@ function Event({ user, handleLikeEvent, handleUnlikeEvent, eventsLiked }) {
         </div>
 
         <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {events?.map((event, index) => (
+          {filteredEvents?.map((event, index) => (
             <EventCard
               user={user}
               key={index}

@@ -5,11 +5,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { EventDto } from 'dto/event.dto';
 import { UpdateEventDto } from 'dto/updateEvent.dto';
 import { Model, Types } from 'mongoose';
+import { User } from 'schemas/user.schemas';
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectModel(Event.name) private eventModel: Model<Event>,
+    @InjectModel(User.name) private userModel: Model<User>,
     private config: ConfigService,
   ) {}
 
@@ -19,8 +21,13 @@ export class EventsService {
         ...dto,
         creator: user._id,
       });
-      const savedEvent = await createdEvent.save();
-      return savedEvent.toObject();
+      const savedEvent = (await createdEvent.save()).toObject();
+      await this.userModel.findByIdAndUpdate(
+        user._id,
+        { $addToSet: { createdEvents: savedEvent._id } },
+        { new: true },
+      );
+      return savedEvent;
     } catch (error) {
       throw new Error('Error during event creation');
     }
@@ -60,7 +67,7 @@ export class EventsService {
       if (!updatedEvent) {
         throw new Error('Error updating event');
       }
-      return updatedEvent;
+      return updatedEvent.toObject();
     } catch (error) {
       throw new Error('Error updating event');
     }

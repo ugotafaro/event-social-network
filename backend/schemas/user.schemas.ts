@@ -12,10 +12,10 @@ export class User {
   password: string;
 
   @Prop()
-  name: string;
+  lastName: string;
 
   @Prop()
-  surname: string;
+  firstName: string;
 
   @Prop()
   createdEvents: ObjectId[];
@@ -24,7 +24,7 @@ export class User {
   likedEvents: ObjectId[];
 
   @Prop()
-  profilePicture: string;
+  image: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

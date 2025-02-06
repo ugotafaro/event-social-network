@@ -80,6 +80,7 @@ export class AppService implements OnModuleInit {
   }
 
   async createUser(@Body() dto: UserDto) {
+    console.log('createUser service api', dto);
     try {
       const response = await this.authCLient
         .send('auth.create', dto)
@@ -90,6 +91,18 @@ export class AppService implements OnModuleInit {
         throw new ForbiddenException(error.message.message);
       }
 
+      throw error;
+    }
+  }
+
+  async changePassword(id: string, password: string, newPassword: string) {
+    console.log('changePassword service api', id, password, newPassword);
+    try {
+      const response = await this.usersClient
+        .send('users.change-password', { id, password, newPassword })
+        .toPromise();
+      return response;
+    } catch (error) {
       throw error;
     }
   }

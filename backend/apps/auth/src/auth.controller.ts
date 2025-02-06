@@ -15,6 +15,7 @@ export class AuthController {
 
   @MessagePattern('auth.create')
   createUser(@Payload() user: UserDto) {
+    console.log('createUser auth controller', user);
     return this.authService.createUser(user);
   }
 

@@ -11,11 +11,11 @@ import {
 export class UserDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  lastName: string;
 
   @IsString()
   @IsNotEmpty()
-  surname: string;
+  firstName: string;
 
   @IsEmail()
   @IsNotEmpty()
@@ -35,5 +35,5 @@ export class UserDto {
 
   @IsString()
   @IsOptional()
-  profilePicture: string;
+  image: string;
 }

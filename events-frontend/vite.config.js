@@ -5,6 +5,9 @@ import federation from "@originjs/vite-plugin-federation";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
+  server: {
+    cors: true,
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -16,6 +19,7 @@ export default defineConfig({
         "./EventCard": "./src/components/EventCard",
         "./CreateEventModal": "./src/components/CreateEventModal",
         "./LikedEvents": "./src/components/LikedEvents",
+        "./CreatedEvents": "./src/components/CreatedEvents",
       },
       shared: ["react"],
     }),
@@ -26,4 +30,12 @@ export default defineConfig({
     minify: false,
     cssCodeSplit: false,
   },
+  preview: {
+    host: "localhost",
+    port: 4173,
+    strictPort: true,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
+  },  
 });

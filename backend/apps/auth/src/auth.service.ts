@@ -7,6 +7,7 @@ import { Model } from 'mongoose';
 import { User } from 'schemas/user.schemas';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
+import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,6 @@ export class AuthService {
     console.log('signin', dto);
     // find the user by email
     const user = await this.userModel.findOne({ email: dto.email }).exec();
-    console.log('user', user);
     if (!user) {
       throw new ForbiddenException('Credentials incorrect');
     }
@@ -35,7 +35,15 @@ export class AuthService {
       throw new ForbiddenException('Credentials incorrect');
     }
 
-    return this.signToken(user.id, user.email);
+    const token = await this.signToken(user.id, user.email);
+
+    const userWithoutPassword = { ...user.toObject() };
+    delete userWithoutPassword.password;
+
+    return {
+      access_token: token.access_token,
+      user: userWithoutPassword,
+    };
   }
 
   async createUser(dto: UserDto) {
@@ -43,18 +51,27 @@ export class AuthService {
       const hash = await argon.hash(dto.password);
 
       const createdUser = new this.userModel({
+        firstName: dto.firstName,
+        lastName: dto.lastName,
         email: dto.email,
         password: hash,
       });
 
+      if (dto.image) {
+        createdUser.image = dto.image;
+      }
+
       const savedUser = await createdUser.save();
+
+      const token = await this.signToken(savedUser.id, savedUser.email);
 
       const userWithoutPassword = { ...savedUser.toObject() };
       delete userWithoutPassword.password;
 
-      console.log('createdUser', userWithoutPassword);
-
-      return this.signToken(savedUser.id, savedUser.email);
+      return {
+        access_token: token.access_token,
+        user: userWithoutPassword,
+      };
     } catch (error) {
       console.error('Error during user creation:', error);
 

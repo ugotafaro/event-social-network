@@ -10,8 +10,15 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { getUserById } from "../services/auth.service";
 import Loading from "./Loading";
+import { motion } from "framer-motion";
+import { likeEvent, unlikeEvent } from "../services/events.service";
 
-export default function EventDetail() {
+export default function EventDetail({
+  user,
+  eventsLiked,
+  handleLikeEvent,
+  handleUnlikeEvent,
+}) {
   const { id } = useParams();
   const [event, setEvent] = useState({});
   const [creator, setCreator] = useState({});
@@ -24,8 +31,19 @@ export default function EventDetail() {
   }, []);
 
   useEffect(() => {
+    console.log("Event:", event);
+  }, [event]);
+
+  const [isLiked, setIsLiked] = useState(
+    eventsLiked.some((e) => e._id === event._id)
+  );
+
+  useEffect(() => {
+    setIsLiked(eventsLiked.some((e) => e._id === event._id));
+  }, [eventsLiked]);
+
+  useEffect(() => {
     if (event?.creator) {
-      // Vérifiez si l'ID du créateur est défini
       getUserById(event.creator)
         .then((user) => {
           setCreator(user);
@@ -39,6 +57,18 @@ export default function EventDetail() {
     }
   }, [event]);
 
+  const handleHeartClick = async (e) => {
+    e.stopPropagation();
+    if (isLiked) {
+      await unlikeEvent(user._id, event._id);
+      handleUnlikeEvent(event);
+    } else {
+      await likeEvent(user._id, event._id);
+      handleLikeEvent(event);
+    }
+    setIsLiked(!isLiked);
+  };
+
   const date = new Date(event?.date);
   const formattedDate = date.toLocaleDateString("en-US", {
     year: "numeric",
@@ -46,10 +76,6 @@ export default function EventDetail() {
     day: "numeric",
   });
   const formattedTime = moment(date).format("h:mm A");
-
-  if (loading) {
-    return <div></div>;
-  }
 
   return (
     <div>
@@ -80,75 +106,24 @@ export default function EventDetail() {
               {event.description}
             </p>
             <div className="flex mt-4 gap-4">
-              <img
-                className="w-13 h-13 mb-3 rounded-full shadow-lg"
-                src="/me.jpeg"
-                alt="Bonnie image"
-              />
+              {creator.image ? (
+                <img
+                  className="w-13 h-13 mb-3 rounded-full shadow-lg"
+                  src={`http://localhost:4000${creator.image}`}
+                  alt="Bonnie image"
+                />
+              ) : (
+                <img
+                  className="w-13 h-13 mb-3 rounded-full shadow-lg"
+                  src="/me.jpeg"
+                  alt="Bonnie image"
+                />
+              )}
               <div>
                 <p className="font-bold">Organized by</p>
-                <p className="font-semibold text-gray-500">{creator.email}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col mt-4 bg-white text-slate-900 px-6 py-5 rounded-lg shadow-lg">
-            <span className="text-2xl font-bold">Comments</span>
-            <div className="flex gap-4 mt-4">
-              <img
-                className="w-10 h-10 mb-3 rounded-full shadow-lg"
-                src="/me.jpeg"
-                alt="Bonnie image"
-              />
-              <textarea
-                name="share_comment"
-                id="share_comment"
-                placeholder="Share your thoughts"
-                className="w-full h-20 p-2 rounded-lg border border-gray-300 outline-none focus:ring-0 focus:outline-none"
-              ></textarea>
-            </div>
-            <div className="mt-4 flex justify-end">
-              <button className="justify-end bg-blue-600 text-white px-4 py-3 rounded-lg">
-                Post Comment
-              </button>
-            </div>
-
-            <div className="mt-4">
-              <div className="flex gap-4">
-                <img
-                  className="w-10 h-10 mb-3 rounded-full shadow-lg"
-                  src="/me.jpeg"
-                  alt="Bonnie image"
-                />
-                <div className="flex flex-col bg-slate-100 px-4 py-3 rounded-lg">
-                  <span className="font-semibold text-xl">Emma Wilson</span>
-                  <span className="text-gray-500 font-semibold">
-                    5 hours ago
-                  </span>
-                  <p className="mt-2">
-                    Will there be virtual attendance options available?
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <div className="flex gap-4">
-                <img
-                  className="w-10 h-10 mb-3 rounded-full shadow-lg"
-                  src="/me.jpeg"
-                  alt="Bonnie image"
-                />
-                <div className="flex flex-col bg-slate-100 px-4 py-3 rounded-lg">
-                  <span className="font-semibold text-xl">Michel Chen</span>
-                  <span className="text-gray-500 font-semibold">
-                    2 hours ago
-                  </span>
-                  <p className="mt-2">
-                    Looking forward to this event! The speaker lineup looks
-                    amazing.
-                  </p>
-                </div>
+                <p className="font-semibold text-gray-500">
+                  {creator.firstName} {creator.lastName}
+                </p>
               </div>
             </div>
           </div>
@@ -156,10 +131,19 @@ export default function EventDetail() {
 
         <div className="w-1/3">
           <div className="flex flex-col mt-4 bg-white text-slate-900 px-6 py-5 rounded-lg shadow-lg">
-            <button className="flex items-center justify-center gap-2 border border-gray-300 p-2 rounded-lg">
-              <Heart className="w-5 h-5" />
+            <motion.button
+              className="flex items-center justify-center gap-2 border border-gray-300 p-2 rounded-lg hover:bg-slate-100 cursor-pointer"
+              onClick={handleHeartClick}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <Heart
+                className={`w-6 h-6 hover:scale-110 transition-colors duration-300 ${
+                  isLiked ? "text-red-500" : "text-gray-400"
+                }`}
+                fill={isLiked ? "red" : "none"}
+              />
               <span className="text-center">Save event</span>
-            </button>
+            </motion.button>
           </div>
 
           <div className="flex flex-col mt-4 bg-white text-slate-900 px-6 py-5 rounded-lg shadow-lg">
@@ -181,16 +165,6 @@ export default function EventDetail() {
                 <div className="flex flex-col">
                   <span className="font-semibold">Location</span>
                   <span>{event.location}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4 mt-4">
-              <div className="flex gap-2">
-                <Tag className="w-4 h-4 mt-2 text-blue-600" />
-                <div className="flex flex-col">
-                  <span className="font-semibold">Price</span>
-                  <span>$299 - Early Bird</span>
                 </div>
               </div>
             </div>

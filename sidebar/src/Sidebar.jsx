@@ -1,21 +1,12 @@
 import React from "react";
 import { Compass } from "lucide-react";
 import { Heart } from "lucide-react";
-import { UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, BrowserRouter } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { Notebook } from "lucide-react";
-import { useEffect } from "react";
 
-export default function Sidebar({ user }) {
-  const location = useLocation();
-
-  useEffect(() => {
-    console.log("User from sidebar : ", user);
-  }, []);
-
+export default function Sidebar({ user, location }) {
   return (
     <>
       <button
@@ -55,19 +46,11 @@ export default function Sidebar({ user }) {
           to="/profile"
           className="flex items-center px-3 py-3 space-x-3 hover:bg-gray-300 m-2 rounded-lg"
         >
-          {user?.image ? (
-            <img
-              className="w-11 h-11 mb-3 rounded-full shadow-lg"
-              src={`http://localhost:4000${user.image}`}
-              alt="Bonnie image"
-            />
-          ) : (
-            <img
-              className="w-11 h-11 mb-3 rounded-full shadow-lg"
-              src="/no-profile-picture.png"
-              alt="Bonnie image"
-            />
-          )}
+          <img
+            className="w-11 h-11 mb-3 rounded-full shadow-lg"
+            src="/no-profile-picture.png"
+            alt="Bonnie image"
+          />
           <h2 className="text-lg font-semibold">
             {user?.firstName} {user?.lastName}
           </h2>
@@ -90,7 +73,7 @@ export default function Sidebar({ user }) {
             <Link to="/liked-event">
               <a
                 href="#"
-                className={`flex items-center p-2  rounded-lg hover:bg-gray-300 ${
+                className={`flex items-center p-2 rounded-lg hover:bg-gray-300 ${
                   location.pathname.includes("liked-event")
                     ? "text-blue-500"
                     : "text-gray-900"
@@ -98,9 +81,7 @@ export default function Sidebar({ user }) {
               >
                 <Heart className="shrink-0 w-5 h-5 transition duration-75  " />
 
-                <span className="flex-1 ms-3 whitespace-nowrap">
-                  Liked events
-                </span>
+                <span className="ms-3">Liked events</span>
               </a>
             </Link>
             <Link to="created-event">
@@ -114,9 +95,7 @@ export default function Sidebar({ user }) {
               >
                 <Notebook className="shrink-0 w-5 h-5 transition duration-75  " />
 
-                <span className="flex-1 ms-3 whitespace-nowrap">
-                  Created events
-                </span>
+                <span className="ms-3">Created events</span>
               </a>
             </Link>
             <Link to="/login">
@@ -129,7 +108,7 @@ export default function Sidebar({ user }) {
               >
                 <LogOut className="shrink-0 w-5 h-5 transition duration-75  " />
 
-                <span className="flex-1 ms-3 whitespace-nowrap">Log out</span>
+                <span className=" ms-3">Log out</span>
               </a>
             </Link>
           </ul>

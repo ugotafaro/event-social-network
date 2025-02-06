@@ -5,20 +5,23 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import Sidebar from "./components/sidebar";
-import Event from "event/Event";
+
 import Login from "./components/login/Login";
 import SignUp from "./components/signup/SignUp";
 import EventDetail from "./components/EventDetail";
-import LikedEvent from "./components/LikedEvent";
 import Profile from "./components/profileSetting";
 import { getUserAuthenticated } from "./services/auth.service";
 import Loading from "./components/Loading";
-import LikedEvents from "event/LikedEvents";
-import { getEventById } from "./services/events.service";
 
-function Layout({ user, loading }) {
+import { getEventById, getEvents } from "./services/events.service";
+import ProtectedRoutes from "./protectedRoutes";
+import Event from "event/Event";
+import LikedEvents from "event/LikedEvents";
+import CreatedEvents from "event/CreatedEvents";
+
+function Layout({ user, loading, setUser, events, setEvents }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [eventsLiked, setEventsLiked] = useState([]);
@@ -27,15 +30,34 @@ function Layout({ user, loading }) {
   const hideSidebar =
     location.pathname === "/login" || location.pathname === "/signup";
 
-  const eventsLikedIds = user ? user.likedEvents : [];
+  const eventsLikedIds = user?.likedEvents ?? [];
+  const createdEventsIds = user?.createdEvents ?? [];
 
   useEffect(() => {
-    eventsLikedIds.forEach(async (id) => {
-      await getEventById(id).then((event) => {
-        setEventsLiked((prev) => [...prev, event]);
-      });
-    });
-  }, [user, eventsLikedIds]);
+    const fetchCreatedEvents = async () => {
+      const events = await Promise.all(
+        createdEventsIds.map((id) => getEventById(id))
+      );
+      setCreatedEvents(events); // Remplace la liste au lieu d'ajouter des doublons
+    };
+
+    if (createdEventsIds.length > 0) {
+      fetchCreatedEvents();
+    }
+  }, [createdEventsIds]);
+
+  useEffect(() => {
+    const fetchLikedEvents = async () => {
+      const events = await Promise.all(
+        eventsLikedIds.map((id) => getEventById(id))
+      );
+      setEventsLiked(events); // Remplace la liste pour éviter les doublons
+    };
+
+    if (eventsLikedIds.length > 0) {
+      fetchLikedEvents();
+    }
+  }, [eventsLikedIds]);
 
   const handleLikeEvent = (event) => {
     if (!eventsLiked.find((e) => e._id === event._id)) {
@@ -45,12 +67,6 @@ function Layout({ user, loading }) {
   const handleUnlikeEvent = (event) => {
     setEventsLiked((prev) => prev.filter((e) => e._id !== event._id));
   };
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/login");
-    }
-  }, [user, loading, navigate]);
 
   if (loading) {
     return (
@@ -63,34 +79,68 @@ function Layout({ user, loading }) {
   return (
     <div className="flex">
       {!hideSidebar && <Sidebar user={user} />}
-      <div className={hideSidebar ? "w-full" : "sm:ml-64"}>
+      <div className={hideSidebar ? "w-full" : "sm:ml-64 w-full h-screen"}>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <Event
-                handleLikeEvent={handleLikeEvent}
-                handleUnlikeEvent={handleUnlikeEvent}
-                user={user}
-                eventsLiked={eventsLiked}
-              />
-            }
-          />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/event/:id" element={<EventDetail />} />
-          <Route
-            path="/liked-event"
-            element={
-              <LikedEvents
-                eventsLiked={eventsLiked}
-                user={user}
-                handleLikeEvent={handleLikeEvent}
-                handleUnlikeEvent={handleUnlikeEvent}
-              />
-            }
-          />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<Login setUser={setUser} />} />
+          <Route path="/signup" element={<SignUp setUser={setUser} />} />
+
+          <Route element={<ProtectedRoutes user={user} loading={loading} />}>
+            <Route
+              path="/"
+              element={
+                <Event
+                  events={events}
+                  setEvents={setEvents}
+                  handleLikeEvent={handleLikeEvent}
+                  handleUnlikeEvent={handleUnlikeEvent}
+                  user={user}
+                  eventsLiked={eventsLiked}
+                  setCreatedEvents={setCreatedEvents}
+                />
+              }
+            />
+            <Route
+              path="/event/:id"
+              element={
+                <EventDetail
+                  user={user}
+                  eventsLiked={eventsLiked}
+                  handleLikeEvent={handleLikeEvent}
+                  handleUnlikeEvent={handleUnlikeEvent}
+                />
+              }
+            />
+            <Route
+              path="/liked-event"
+              element={
+                <LikedEvents
+                  eventsLiked={eventsLiked}
+                  user={user}
+                  handleLikeEvent={handleLikeEvent}
+                  handleUnlikeEvent={handleUnlikeEvent}
+                />
+              }
+            />
+            <Route
+              path="/created-event"
+              element={
+                <CreatedEvents
+                  user={user}
+                  createdEvents={createdEvents}
+                  setCreatedEvents={setCreatedEvents}
+                  handleLikeEvent={handleLikeEvent}
+                  handleUnlikeEvent={handleUnlikeEvent}
+                  eventsLiked={eventsLiked}
+                  events={events}
+                  setEvents={setEvents}
+                />
+              }
+            />
+            <Route
+              path="/profile"
+              element={<Profile user={user} setUser={setUser} />}
+            />
+          </Route>
         </Routes>
       </div>
     </div>
@@ -99,24 +149,57 @@ function Layout({ user, loading }) {
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // État de chargement
+  const [loading, setLoading] = useState(true); // Initial loading state
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    getUserAuthenticated()
-      .then((user) => {
-        setUser(user);
+    // Try to get events when the app loads
+    getEvents()
+      .then((fetchedEvents) => {
+        setEvents(fetchedEvents);
       })
-      .catch((error) => {
-        console.error("Error getting authenticated user: ", error);
-      })
-      .finally(() => {
-        setLoading(false); // Arrête le chargement après la tentative d'auth
-      });
+      .catch((error) => console.error("Error fetching events:", error))
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setLoading(true);
+      getUserAuthenticated()
+        .then((fetchedUser) => {
+          setUser(fetchedUser);
+          localStorage.setItem("user", JSON.stringify(fetchedUser)); // Sauvegarde user
+        })
+        .catch((error) => {
+          console.error("Error fetching user:", error);
+          setUser(null);
+          localStorage.removeItem("user"); // Supprime si erreur
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser)); // Recharge user depuis localStorage
+    }
   }, []);
 
   return (
     <BrowserRouter>
-      <Layout user={user} loading={loading} />
+      <Layout
+        user={user}
+        loading={loading}
+        setUser={setUser}
+        events={events}
+        setEvents={setEvents}
+      />
     </BrowserRouter>
   );
 }

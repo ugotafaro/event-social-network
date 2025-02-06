@@ -29,6 +29,16 @@ export class UsersController {
     return await this.usersService.updateUser(data.id, data.dto);
   }
 
+  @MessagePattern('users.change-password')
+  async changePassword(@Payload() data: any) {
+    console.log('data user controller', data);
+    return await this.usersService.changePassword(
+      data.id,
+      data.password,
+      data.newPassword,
+    );
+  }
+
   @MessagePattern('users.delete')
   async deleteUser(@Payload() id: string) {
     return await this.usersService.deleteUser(id);

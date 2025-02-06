@@ -4,6 +4,8 @@ import {
   Users,
   Clock,
   Heart,
+  Trash2,
+  Pencil,
   Search,
   Filter,
   Plus,
@@ -12,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { likeEvent, unlikeEvent } from "../../events.service";
+import { deleteEvent, likeEvent, unlikeEvent } from "../../events.service";
 import { useEffect } from "react";
 
 const EventCard = ({
@@ -21,6 +23,9 @@ const EventCard = ({
   handleLikeEvent,
   handleUnlikeEvent,
   eventsLiked,
+  handleModalModify,
+  fromCreatedEvents = false,
+  onDeleteEvent,
 }) => {
   const navigateToEvent = () => {
     window.location.href = `/event/${event._id}`;
@@ -53,12 +58,39 @@ const EventCard = ({
     day: "numeric",
   });
 
+  const handleDeleteEvent = async (e, event) => {
+    e.stopPropagation();
+    await deleteEvent(event._id)
+      .then(() => {
+        onDeleteEvent(event);
+      })
+      .catch((error) => {
+        console.error("Error deleting event:", error);
+      });
+  };
+
   const formattedTime = moment(date).format("h:mm A");
   return (
     <div
-      className="bg-slate-100 cursor-pointer rounded-lg shadow-xl transition-transform duration-300 hover:scale-105"
+      className="relative bg-slate-100 cursor-pointer rounded-lg shadow-xl transition-transform duration-300 hover:scale-105"
       onClick={navigateToEvent}
     >
+      {fromCreatedEvents && (
+        <div className="flex items-center gap-2 absolute top-2 right-2 ">
+          <div
+            className=" bg-white hover:bg-slate-200 rounded-full p-2"
+            onClick={(e) => handleModalModify(e, event)}
+          >
+            <Pencil className="w-4 h-4" />
+          </div>
+          <div
+            className=" bg-white hover:bg-slate-200 rounded-full p-2"
+            onClick={(e) => handleDeleteEvent(e, event)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </div>
+        </div>
+      )}
       <img
         src={`http://localhost:4000${event.image}`}
         alt={event.title}

@@ -1,14 +1,5 @@
 import axios from "axios";
 
-export const getEvents = async () => {
-  try {
-    const response = await axios.get("http://localhost/api/events");
-    return response.data;
-  } catch (error) {
-    throw new Error("Error getting events");
-  }
-};
-
 export const createEvent = async (event, user) => {
   try {
     const response = await axios.post("http://localhost/api/events/create", {
@@ -51,5 +42,28 @@ export const unlikeEvent = async (userId, eventId) => {
     return response.data;
   } catch (error) {
     throw new Error("Error unliking event");
+  }
+};
+
+export const updateEvent = async (event) => {
+  try {
+    const response = await axios.put(
+      `http://localhost/api/events/update/${event._id}`,
+      event
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error updating event");
+  }
+};
+
+export const deleteEvent = async (eventId) => {
+  try {
+    const response = await axios.delete(
+      `http://localhost/api/events/delete/${eventId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error deleting event");
   }
 };

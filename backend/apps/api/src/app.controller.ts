@@ -74,6 +74,16 @@ export class AppController {
     return await this.appService.removeEventLiked(data.userId, data.eventId);
   }
 
+  @Put('users/change-password')
+  async changePassword(@Body() data: any) {
+    console.log('data api controller', data);
+    return await this.appService.changePassword(
+      data.userId,
+      data.password,
+      data.newPassword,
+    );
+  }
+
   @Post('events/create')
   // @UseGuards(JwtAuthGuard)
   async createEvent(@Body() data: any) {

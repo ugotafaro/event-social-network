@@ -1,9 +1,4 @@
-import {
-  IS_STRONG_PASSWORD,
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class EventDto {
   @IsString()
@@ -21,4 +16,8 @@ export class EventDto {
   @IsString()
   @IsNotEmpty()
   location: string;
+
+  @IsString()
+  @IsNotEmpty()
+  image: string;
 }

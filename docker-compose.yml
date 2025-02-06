@@ -32,6 +32,7 @@ services:
   kafka:
     image: "docker.io/bitnami/kafka:2-debian-10"
     container_name: kafka
+    restart: always
     ports:
       - 9092:9092
       - 9093:9093
@@ -48,9 +49,23 @@ services:
     networks:
       - backend
 
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ~/data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    networks:
+      - backend
+
   nginx:
     image: nginx:alpine
     container_name: nginx
+    restart: always
     ports:
       - "80:80"
     volumes:
@@ -59,6 +74,7 @@ services:
       - api
       - auth
       - events
+      - users
       - frontend
     networks:
       - backend
@@ -71,6 +87,7 @@ services:
     ports:
       - "4000:4000"
     depends_on:
+      mongodb:
       rabbitmq:
         condition: service_healthy
       auth:
@@ -79,6 +96,7 @@ services:
         condition: service_started
       users:
         condition: service_started
+
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
@@ -99,6 +117,8 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+      mongodb:
+        condition: service_started
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
@@ -112,7 +132,10 @@ services:
       dockerfile: apps/events/Dockerfile
     container_name: events
     depends_on:
-      - kafka
+      kafka:
+        condition: service_started
+      mongodb:
+        condition: service_started
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
@@ -131,10 +154,28 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+      mongodb:
+        condition: service_started
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     command: npm run start:dev users
+    networks:
+      - backend
+
+  events-frontend:
+    build:
+      context: ./events-frontend
+      dockerfile: Dockerfile
+    container_name: events-frontend
+    volumes:
+      - ./events-frontend:/app
+      - /app/node_modules
+    ports:
+      - "4173:4173"
+    environment:
+      - VITE_HOST=0.0.0.0
+    command: ["npm", "run", "preview", "--", "--host"]
     networks:
       - backend
 
@@ -150,6 +191,10 @@ services:
       - "5173:5173"
     environment:
       - NODE_ENV=development
+    depends_on:
+      events-frontend:
+        condition: service_started
+
     command: ["npm", "run", "dev", "--", "--host"]
 
 networks:
