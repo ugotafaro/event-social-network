@@ -26,4 +26,4 @@ docker-compose up
 
 ## UML
 
-![Texte alternatif](Frame 1.png)
+![Texte alternatif](./Frame%201.png)
