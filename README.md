@@ -27,3 +27,7 @@ docker-compose up
 ## UML
 
 ![Texte alternatif](./Frame%201.png)
+
+![Texte alternatif](./Frame%202.png)
+
+
