@@ -12,6 +12,8 @@ git clone https://github.com/ugotafaro/event-social-network
 RABBITMQ_HOST= rabbitmq
 RABBITMQ_PORT= 5672
 JWT_SECRET="your_jwt_secret"
+DATABASE_NAME="sne-db"
+DATABASE_URI="mongodb+srv://utafaro:root@cluster0.cwj57.mongodb.net/"
 ```
 
 **3. Run the docker-compose**
