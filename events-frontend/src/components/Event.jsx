@@ -9,8 +9,7 @@ import {
   Filter,
   Plus,
 } from "lucide-react";
-import { useEffect } from "react";
-import { getEvents } from "../../events.service";
+
 import CreateEventModal from "./CreateEventModal";
 
 function Event({

@@ -38,26 +38,26 @@ function Layout({ user, loading, setUser, events, setEvents }) {
       const events = await Promise.all(
         createdEventsIds.map((id) => getEventById(id))
       );
-      setCreatedEvents(events); // Remplace la liste au lieu d'ajouter des doublons
+      setCreatedEvents(events);
     };
 
     if (createdEventsIds.length > 0) {
       fetchCreatedEvents();
     }
-  }, [createdEventsIds]);
+  }, [user]);
 
   useEffect(() => {
     const fetchLikedEvents = async () => {
       const events = await Promise.all(
         eventsLikedIds.map((id) => getEventById(id))
       );
-      setEventsLiked(events); // Remplace la liste pour éviter les doublons
+      setEventsLiked(events);
     };
 
     if (eventsLikedIds.length > 0) {
       fetchLikedEvents();
     }
-  }, [eventsLikedIds]);
+  }, [user]);
 
   const handleLikeEvent = (event) => {
     if (!eventsLiked.find((e) => e._id === event._id)) {
@@ -67,6 +67,11 @@ function Layout({ user, loading, setUser, events, setEvents }) {
   const handleUnlikeEvent = (event) => {
     setEventsLiked((prev) => prev.filter((e) => e._id !== event._id));
   };
+
+  useEffect(() => {
+    console.log("Liked events:", eventsLiked);
+    console.log("Created events:", createdEvents);
+  }, []);
 
   if (loading) {
     return (
@@ -153,36 +158,35 @@ function App() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    // Try to get events when the app loads
     getEvents()
       .then((fetchedEvents) => {
         setEvents(fetchedEvents);
       })
       .catch((error) => console.error("Error fetching events:", error))
       .finally(() => setLoading(false));
-  }, []);
+  }, [user]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setLoading(true);
-      getUserAuthenticated()
-        .then((fetchedUser) => {
-          setUser(fetchedUser);
-          localStorage.setItem("user", JSON.stringify(fetchedUser)); // Sauvegarde user
-        })
-        .catch((error) => {
-          console.error("Error fetching user:", error);
-          setUser(null);
-          localStorage.removeItem("user"); // Supprime si erreur
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     setLoading(true);
+  //     getUserAuthenticated()
+  //       .then((fetchedUser) => {
+  //         setUser(fetchedUser);
+  //         localStorage.setItem("user", JSON.stringify(fetchedUser)); // Sauvegarde user
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching user:", error);
+  //         setUser(null);
+  //         localStorage.removeItem("user"); // Supprime si erreur
+  //       })
+  //       .finally(() => {
+  //         setLoading(false);
+  //       });
+  //   } else {
+  //     setLoading(false);
+  //   }
+  // }, []);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");

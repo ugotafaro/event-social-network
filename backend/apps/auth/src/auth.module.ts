@@ -13,7 +13,14 @@ import { JwtStrategy } from 'strategy';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    MongooseModule.forRoot('mongodb://mongodb:27017/event-social-network'),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('DATABASE_URI'),
+        dbName: configService.get<string>('DATABASE_NAME'),
+      }),
+      inject: [ConfigService],
+    }),
 
     JwtModule.register({}),
 

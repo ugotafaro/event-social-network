@@ -14,7 +14,11 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { deleteEvent, likeEvent, unlikeEvent } from "../../events.service";
+import {
+  likeEvent,
+  unlikeEvent,
+  deleteEvent,
+} from "../../services/events.service";
 import { useEffect } from "react";
 
 const EventCard = ({

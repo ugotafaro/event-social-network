@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import moment from "moment";
-import { createEvent, updateEvent } from "../../events.service";
+import { createEvent, updateEvent } from "../../services/events.service";
 
 export default function ModifyEventModal({
   isOpen,

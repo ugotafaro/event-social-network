@@ -111,7 +111,7 @@ export default function Profile({ user, setUser }) {
           {image ? (
             <img
               className="w-10 h-10 mt-1 rounded-full shadow-lg"
-              src={image}
+              src={user?.image}
             ></img>
           ) : (
             <img

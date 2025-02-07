@@ -28,11 +28,11 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('users')
+  @UseGuards(JwtAuthGuard)
   getAllUsers() {
     return this.appService.getAllUsers();
   }
 
-  //get the user logged in
   @Get('users/profile')
   @UseGuards(JwtAuthGuard)
   getMe(@Request() req: any) {
@@ -40,16 +40,19 @@ export class AppController {
   }
 
   @Get('users/:id')
+  @UseGuards(JwtAuthGuard)
   getUserById(@Param() params: any) {
     return this.appService.getUserById(params.id);
   }
 
   @Put('users/update/:id')
+  @UseGuards(JwtAuthGuard)
   async updateUser(@Param() params: any, @Body() dto: UpdateUserDto) {
     return await this.appService.updateUser(params.id, dto);
   }
 
   @Delete('users/delete/:id')
+  @UseGuards(JwtAuthGuard)
   async deleteUser(@Param() params: any) {
     return await this.appService.deleteUser(params.id);
   }
@@ -65,16 +68,19 @@ export class AppController {
   }
 
   @Post('users/add-event-liked')
+  @UseGuards(JwtAuthGuard)
   async addEventLiked(@Body() data: any) {
     return await this.appService.addEventLiked(data.userId, data.eventId);
   }
 
   @Post('users/remove-event-liked')
+  @UseGuards(JwtAuthGuard)
   async removeEventLiked(@Body() data: any) {
     return await this.appService.removeEventLiked(data.userId, data.eventId);
   }
 
   @Put('users/change-password')
+  @UseGuards(JwtAuthGuard)
   async changePassword(@Body() data: any) {
     console.log('data api controller', data);
     return await this.appService.changePassword(
@@ -85,30 +91,31 @@ export class AppController {
   }
 
   @Post('events/create')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async createEvent(@Body() data: any) {
     return await this.appService.createEvent(data.event, data.user);
   }
 
   @Get('events')
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   getAllEvents() {
     return this.appService.getAllEvents();
   }
 
   @Get('events/:id')
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getEventById(@Param() params: any) {
     return await this.appService.getEventById(params.id);
   }
 
   @Put('events/update/:id')
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async updateEvent(@Param() params: any, @Body() eventDto: UpdateEventDto) {
     return await this.appService.updateEvent(params.id, eventDto);
   }
 
   @Delete('events/delete/:id')
+  @UseGuards(JwtAuthGuard)
   async deleteEvent(@Param() params: any) {
     return await this.appService.deleteEvent(params.id);
   }

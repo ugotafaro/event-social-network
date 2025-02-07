@@ -1,8 +1,7 @@
 // import lazy
 import React from "react";
 import EventCard from "./EventCard";
-import { getEventById } from "../../events.service";
-import { useEffect, useState } from "react";
+
 export default function LikedEvent({
   user,
   eventsLiked,

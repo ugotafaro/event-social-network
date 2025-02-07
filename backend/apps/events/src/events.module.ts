@@ -13,7 +13,14 @@ import { User, UserSchema } from 'schemas/user.schemas';
       isGlobal: true,
     }),
 
-    MongooseModule.forRoot('mongodb://mongodb:27017/event-social-network'),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('DATABASE_URI'),
+        dbName: configService.get<string>('DATABASE_NAME'),
+      }),
+      inject: [ConfigService],
+    }),
     JwtModule.register({}),
     MongooseModule.forFeature([{ name: Event.name, schema: EventSchema }]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),

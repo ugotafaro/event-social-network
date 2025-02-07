@@ -17,6 +17,15 @@ import { EventSchema } from 'schemas/event.schemas';
 
     JwtModule.register({}),
 
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('DATABASE_URI'),
+        dbName: configService.get<string>('DATABASE_NAME'),
+      }),
+      inject: [ConfigService],
+    }),
+
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Event.name, schema: EventSchema }]),
   ],

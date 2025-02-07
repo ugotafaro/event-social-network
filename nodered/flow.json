@@ -1,0 +1,42 @@
+[
+  {
+    "id": "2e72c3a4061ef472",
+    "type": "http in",
+    "z": "f6f2187d.f17ca8",
+    "name": "Get Message",
+    "url": "/get-message",
+    "method": "get",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 190,
+    "y": 400,
+    "wires": [["f0d137101ab9d69a", "e24eae5c24e8c765"]]
+  },
+  {
+    "id": "e24eae5c24e8c765",
+    "type": "function",
+    "z": "f6f2187d.f17ca8",
+    "name": "random",
+    "func": "const splashList = [\n    \"Ported implementation!\",\n    \"100% more yellow text!\",\n    \"flowers more important than grass\",\n    \"Dramatic lighting!\",\n    \"Made in C++!\",\n    \"Almost C++14!\",\n    \"OpenGL ES 2.0+!\",\n    \"Multithreaded!\",\n    \"Quite Indie!\",\n    \"!!!1!\",\n    \"Hmmmrmm.\",\n    \"V-synched!\",\n    \"0xffff-1 chunks\",\n    \"Endless!\",\n    \"Ask your mother!\",\n    \"Episode 3!\",\n    \"Cubism!\",\n    \"Astronomically accurate!\",\n    \"Made by Mojang!\",\n    \"0% sugar!\",\n    \"Now with skins!\",\n    \"Blame shogchips\",\n    \"Glowing creepy eyes!\",\n    \"& Knuckles!\",\n    \"code.org/minecraft\",\n    \"discord.gg/minecraft\",\n    \"Machine learning!\",\n    \"Release the Snord!\",\n    \"Team Mystic!\",\n    \"Living, breathing world!\",\n    \"Innovating innovation!\",\n    \"High-key!\",\n    \"Funding secured!\",\n    \"YANNY OR LAUREL???\",\n    \"So. You read splash text.\",\n    \"Change my mind.\",\n    \"The Floor is Lava!\",\n    \"Make a viral video!!1\",\n    \"When it's ready!\",\n    \"Mostly harmless!\",\n    \"Pandamonium!\",\n    \"Alexander Hamilton!\",\n    \"Thanks for the fish!\",\n    \"Take an egg beater and beat it against a skillet!\",\n    \"#Blessed!\",\n    \"Have you finished your homework?\",\n    \"We're working on it!\",\n    \"Like that smash button!\",\n    \"Minecraft 2 unconfirmed!\",\n    \"A circle-free environment!\",\n    \"Llama, llama, duck!\",\n    \"Artisinal!\",\n    \"Savage Dad jokes!\",\n    \"Protec but also attac\",\n    \"Potatoes gonna potate!\",\n    \"Bananas!\",\n    \"zhoolor\",\n    \"Oh geez!\",\n    \"Crush it!\",\n    \"Keep your head down, there's two of us in here now. Remember?\",\n    \"Sodium free!\",\n    \"What DOES the fox say?\",\n    \"#gartzkebrokeit\",\n    \"All blocks covered!\",\n    \"feedback.minecraft.net\",\n    \"Don't cross the Border Blocks\",\n    \"An enderman stole my homework\",\n    \"Virtual Ecology\",\n    \"All paths lead to learning.\",\n    \"The evolution of education.\",\n    \"This really is my homework!\",\n    \"Kids tested, teacher approved!\",\n    \"A creeper blew up my homework\",\n    \"Teachers gonna teach\",\n    \"Worlds of Wisdom\",\n    \"Explore. Learn. Create.\",\n    \"Learning made fun\",\n    \"Virtual worlds, real learning\",\n    \"Thatsssss a nice lessssson you have there...\",\n    \"Merry X-mas!\",\n    \"Happy new year!\",\n    \"OOoooOOOoooo! Spooky!\",\n    \"<PLAYERNAME> IS YOU\",\n    \"[this splash text has been delayed until part 2]\",\n    \"0% sugar!\",\n    \"700+ hits on YouTube!\",\n    \"Absolutely dragon free!\",\n    \"Almost java 6!\",\n    \"Now java 6!\",\n    \"Now Java 6!\",\n    \"Now Java 8!\",\n    \"Now Java 16!\",\n    \"Coming soon!\",\n    \"Cooler than Spock!\",\n    \"Cześć Polska!\",\n    \"More than 5000 sold!\",\n    \"More than 25000 sold!\",\n    \"Notch <3 Ez!\",\n    \"\\\"Noun\\\" is an autonym!\",\n    \"Now supports ÅÄÖ!\",\n    \"OpenGL 1.1!\",\n    \"OpenGL 1.2!\",\n    \"OpenGL 2.1 (if supported)!\",\n    \"Rude with two dudes with food!\",\n    \"Sexy!\",\n    \"SOPA means LOSER in Swedish\",\n    \"Superfragilisticexpialidocious!\",\n    \"That's not a moon!\",\n    \"This is good for realms.\",\n    \"Tyrian would love it!\",\n    \"When it's finished!\",\n    \"Now with 100% more yellow text![43]\",\n    \"One star! Deal with it notch!\",\n    \"Haha, LOL!\",\n    \"Play Minecraft, Watch Topgear, Get Pig!\",\n    \"Play minecraftApp, Watch Topgear, Get Pig!\",\n    \"Play Minecraft: PE, Watch Topgear, Get Pig!\",\n    \"OpenGL ES 1.1!\",\n    \"Almost C++11!\",\n    \"Almost C++14!\",\n    \"minecraftApp!\",\n    \"Uses C++!\",\n    \"The Work of Notch!\",\n    \"Jason! Jason! Jason!\",\n    \"Verlet intregration!\",\n    \"Not on steam!\"\n]\n\nfunction getRandomElement(arr) {\n  const randomIndex = Math.floor(Math.random() * arr.length);\n  return arr[randomIndex];\n}\n\nmsg.payload = getRandomElement(splashList)\n\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 520,
+    "wires": [["5f70c7f87ebfa1c2"]]
+  },
+  {
+    "id": "5f70c7f87ebfa1c2",
+    "type": "http response",
+    "z": "f6f2187d.f17ca8",
+    "name": "",
+    "statusCode": "",
+    "headers": {},
+    "x": 530,
+    "y": 400,
+    "wires": []
+  }
+]
