@@ -12,7 +12,10 @@ git clone https://github.com/ugotafaro/event-social-network
 RABBITMQ_HOST= rabbitmq
 RABBITMQ_PORT= 5672
 JWT_SECRET="your_jwt_secret"
+DATABASE_NAME="sne-db"
+DATABASE_URI="mongodb+srv://utafaro:root@cluster0.cwj57.mongodb.net/"
 ```
+(MongoDB Atlas does not work with UBB WiFi. Use your own Wifi.
 
 **3. Run the docker-compose**
 
@@ -27,3 +30,7 @@ docker-compose up
 ## UML
 
 ![Texte alternatif](./Frame%201.png)
+
+![Texte alternatif](./Frame%202.png)
+
+
