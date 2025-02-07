@@ -15,6 +15,7 @@ JWT_SECRET="your_jwt_secret"
 DATABASE_NAME="sne-db"
 DATABASE_URI="mongodb+srv://utafaro:root@cluster0.cwj57.mongodb.net/"
 ```
+(MongoDB Atlas does not work with UBB WiFi. Use your own Wifi.
 
 **3. Run the docker-compose**
 
